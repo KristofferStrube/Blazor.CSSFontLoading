@@ -7,6 +7,13 @@
 # Introduction
 A Blazor wrapper for the [CSS Font Loading](https://drafts.csswg.org/css-font-loading/) browser API.
 
-The API standardizes ways to dynamically load fonts in the browser. This project implements a wrapper around the API for Blazor so that we can easily and safely interact with it from Blazor.
+The API standardizes ways to dynamically load fonts in the browser and to check for their support. This project implements a wrapper around the API for Blazor so that we can easily and safely interact with it from Blazor.
 
-_**This is still being implemented so coverage is very limited.**_
+**This is still being implemented so coverage is very limited.**
+
+# Demo
+The sample project can be demoed at https://kristofferstrube.github.io/Blazor.CSSFontLoading/
+
+On each page you can find the corresponding code for the example in the top right corner.
+
+On the [Status page](https://kristofferstrube.github.io/Blazor.CSSFontLoading/Status) you can see how much of the WebIDL specs this wrapper has covered.
