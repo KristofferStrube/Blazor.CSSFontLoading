@@ -1,0 +1,190 @@
+﻿@page "/"
+@inject IDocumentService DocumentService
+
+<PageTitle>Blazor.CSSFontLoading</PageTitle>
+
+<h2>Checking your fonts</h2>
+<p>
+    Here we check a list of common fonts available on Windows and Mac devices respectively using the <a href="https://drafts.csswg.org/css-font-loading/">CSS Font Loading</a> API using the Blazor wrapper <a href="https://github.com/KristofferStrube/Blazor.CSSFontLoading">Blazor.CSSFontLoading</a>.
+    This makes it possible for us to know which fonts we can use on a site. We use the <code>FontFaceSet</code> method <code>CheckAsync(string font, string text)</code> to check for support.
+    Supported fonts are marked with <span style="background-color:lightgreen">a green background</span> and unsupported fonts are marked with <span style="background-color:pink;">a red background</span> in the below lists.
+</p>
+
+<div style="display:flex;flex-direction:row;height:40vh;">
+    <div style="display:flex;flex:1;flex-direction:column;border:solid 1px black;">
+        <h4>Common Windows fonts</h4>
+        <div style="display:flex;flex:1;flex-direction:column;overflow-y:scroll;">
+            @for (int i = 0; i < windowsSupported.Length; i++)
+            {
+                <div style="background-color:@(windowsSupported[i] ? "lightgreen" : "pink");"><span style="font-family:@windowsFonts[i];">@windowsFonts[i]</span> (@windowsFonts[i])</div>
+            }
+        </div>
+    </div>
+    <div style="display:flex;flex:1;flex-direction:column;border:solid 1px black;">
+        <h4>Common Mac fonts</h4>
+        <div style="display:flex;flex:1;flex-direction:column;overflow-y:scroll;">
+            @for (int i = 0; i < macSupported.Length; i++)
+            {
+                <div style="background-color:@(macSupported[i] ? "lightgreen" : "pink");"><span style="font-family:@macFonts[i];">@macFonts[i]</span> (@macFonts[i])</div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    bool[] windowsSupported = Array.Empty<bool>();
+    bool[] macSupported = Array.Empty<bool>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var fontFaceSet = await DocumentService.GetFontsAsync();
+        windowsSupported = await Task.WhenAll(windowsFonts.Select(async font => {
+            try
+            {
+                return await fontFaceSet.CheckAsync($"12px {font}", font);
+            }
+            catch {
+                return false;
+            }
+        }));
+        macSupported = await Task.WhenAll(macFonts.Select(async font =>
+        {
+            try
+            {
+                return await fontFaceSet.CheckAsync($"12px {font}", font);
+            }
+            catch
+            {
+                return false;
+            }
+        }));
+    }
+
+    string[] windowsFonts = new string[]
+    {
+        "Arial",
+        "Arial Black",
+        "Bahnschrift",
+        "Calibri",
+        "Cambria",
+        "Cambria Math",
+        "Candara",
+        "Comic Sans MS",
+        "Consolas",
+        "Constantia",
+        "Corbel",
+        "Courier New",
+        "Ebrima",
+        "Franklin Gothic Medium",
+        "Gabriola",
+        "Gadugi",
+        "Georgia",
+        "HoloLens MDL2 Assets",
+        "Impact",
+        "Ink Free",
+        "Javanese Text",
+        "Leelawadee UI",
+        "Lucida Console",
+        "Lucida Sans Unicode",
+        "Malgun Gothic",
+        "Marlett",
+        "Microsoft Himalaya",
+        "Microsoft JhengHei",
+        "Microsoft New Tai Lue",
+        "Microsoft PhagsPa",
+        "Microsoft Sans Serif",
+        "Microsoft Tai Le",
+        "Microsoft YaHei",
+        "Microsoft Yi Baiti",
+        "MingLiU-ExtB",
+        "Mongolian Baiti",
+        "MS Gothic",
+        "MV Boli",
+        "Myanmar Text",
+        "Nirmala UI",
+        "Palatino Linotype",
+        "Segoe MDL2 Assets",
+        "Segoe Print",
+        "Segoe Script",
+        "Segoe UI",
+        "Segoe UI Historic",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "SimSun",
+        "Sitka",
+        "Sylfaen",
+        "Symbol",
+        "Tahoma",
+        "Times New Roman",
+        "Trebuchet MS",
+        "Verdana",
+        "Webdings",
+        "Wingdings",
+        "Yu Gothic"
+    };
+
+    string[] macFonts = new string[]
+    {
+        "American Typewriter",
+        "Andale Mono",
+        "Arial",
+        "Arial Black",
+        "Arial Narrow",
+        "Arial Rounded MT Bold",
+        "Arial Unicode MS",
+        "Avenir",
+        "Avenir Next",
+        "Avenir Next Condensed",
+        "Baskerville",
+        "Big Caslon",
+        "Bodoni 72",
+        "Bodoni 72 Oldstyle",
+        "Bodoni 72 Smallcaps",
+        "Bradley Hand",
+        "Brush Script MT",
+        "Chalkboard",
+        "Chalkboard SE",
+        "Chalkduster",
+        "Charter",
+        "Cochin",
+        "Comic Sans MS",
+        "Copperplate",
+        "Courier",
+        "Courier New",
+        "Didot",
+        "DIN Alternate",
+        "DIN Condensed",
+        "Futura",
+        "Geneva",
+        "Georgia",
+        "Gill Sans",
+        "Helvetica",
+        "Helvetica Neue",
+        "Herculanum",
+        "Hoefler Text",
+        "Impact",
+        "Lucida Grande",
+        "Luminari",
+        "Marker Felt",
+        "Menlo",
+        "Microsoft Sans Serif",
+        "Monaco",
+        "Noteworthy",
+        "Optima",
+        "Palatino",
+        "Papyrus",
+        "Phosphate",
+        "Rockwell",
+        "Savoye LET",
+        "SignPainter",
+        "Skia",
+        "Snell Roundhand",
+        "Tahoma",
+        "Times",
+        "Times New Roman",
+        "Trattatello",
+        "Trebuchet MS",
+        "Verdana",
+        "Zapfino"
+    };
+}

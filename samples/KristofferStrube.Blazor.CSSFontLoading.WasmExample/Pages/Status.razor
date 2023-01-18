@@ -1,0 +1,84 @@
+﻿@page "/Status"
+
+@using HtmlAgilityPack;
+
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+
+<PageTitle>File System Access - Status</PageTitle>
+
+@if (compareText is not null)
+{
+    <pre><code>
+            @((MarkupString)compareText)
+        </code></pre>
+}
+else
+{
+    <text>Loading WebIDL from specs ...</text>
+}
+
+@code {
+    private string? compareText;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var domString = await HttpClient.GetStringAsync("https://drafts.csswg.org/css-font-loading/#idl-index");
+
+            var dom = new HtmlDocument();
+            dom.LoadHtml(domString);
+            var idlIndexHeader = dom.GetElementbyId("idl-index");
+            var webIDLNode = idlIndexHeader.NextSibling.NextSibling;
+            var webIDLText = webIDLNode.InnerText;
+            // We normalize to indent with 4 spaces as that is inconsistent in the current WebIDL specs.
+            var fetchedLines = webIDLText.Replace("    ", "  ").Replace("\n  ", "\n    ").Split('\n');
+            var supportedLines = currentlySupportedWebIDL.Replace("<", "&lt;").Split('\n');
+            var compareLines = new List<string>();
+            var fetchedIndex = 0;
+            var supportedIndex = 0;
+            while (fetchedIndex < fetchedLines.Length || supportedIndex < supportedLines.Length)
+            {
+                var color = "pink";
+                if (fetchedIndex == fetchedLines.Length)
+                {
+                    color = "cyan";
+                    supportedIndex++;
+                    fetchedIndex--;
+                }
+                else if (supportedIndex == supportedLines.Length)
+                {
+                    color = "lemonchiffon";
+                }
+                else if (fetchedLines[fetchedIndex].Trim() == supportedLines[supportedIndex].Trim())
+                {
+                    color = "lightgreen";
+                    supportedIndex++;
+                }
+                compareLines.Add($"""<span style="background-color:{color};display:block;min-height:21px;">{fetchedLines[fetchedIndex++]}</span>""");
+            }
+            compareText = string.Join("", compareLines);
+            StateHasChanged();
+        }
+    }
+
+    private const string currentlySupportedWebIDL =
+                    @"[Exposed=(Window,Worker)]
+interface FontFace {
+    constructor(CSSOMString family, (CSSOMString or BinaryData) source,
+          optional FontFaceDescriptors descriptors = {});
+    attribute CSSOMString family;
+};
+
+interface FontFaceSet : EventTarget {
+    constructor(sequence<FontFace> initialFaces);
+    FontFaceSet add(FontFace font);
+    boolean delete(FontFace font);
+    undefined clear();
+    // return whether all fonts in the fontlist are loaded
+    // (does not initiate load if not available)
+    boolean check(CSSOMString font, optional CSSOMString text = "" "");
+};";
+
+}
