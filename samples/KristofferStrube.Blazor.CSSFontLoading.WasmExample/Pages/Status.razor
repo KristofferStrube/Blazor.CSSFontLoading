@@ -64,7 +64,21 @@ else
     }
 
     private const string currentlySupportedWebIDL =
-                    @"[Exposed=(Window,Worker)]
+                    @"dictionary FontFaceDescriptors {
+    CSSOMString style = ""normal"";
+    CSSOMString weight = ""normal"";
+    CSSOMString stretch = ""normal"";
+    CSSOMString unicodeRange = ""U+0-10FFFF"";
+    CSSOMString variant = ""normal"";
+    CSSOMString featureSettings = ""normal"";
+    CSSOMString variationSettings = ""normal"";
+    CSSOMString display = ""auto"";
+    CSSOMString ascentOverride = ""normal"";
+    CSSOMString descentOverride = ""normal"";
+    CSSOMString lineGapOverride = ""normal"";
+};
+
+[Exposed=(Window,Worker)]
 interface FontFace {
     constructor(CSSOMString family, (CSSOMString or BinaryData) source,
           optional FontFaceDescriptors descriptors = {});
@@ -79,6 +93,12 @@ interface FontFaceSet : EventTarget {
     // return whether all fonts in the fontlist are loaded
     // (does not initiate load if not available)
     boolean check(CSSOMString font, optional CSSOMString text = "" "");
-};";
+};
+
+interface mixin FontFaceSource {
+    readonly attribute FontFaceSet fonts;
+};
+
+Document includes FontFaceSource;";
 
 }
